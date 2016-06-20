@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MenuView">
+        <attr name="textColor" format="color"/><!--文字颜色-->
+        <attr name="textSize" format="dimension"/><!--文字大小-->
+        <attr name="visibleCount" format="dimension"/><!--可见数量-->
+        <attr name="iconOrientation" format="integer"/><!--icon 和文字 布局方向，垂直/水平-->
+    </declare-styleable>
+</resources>
