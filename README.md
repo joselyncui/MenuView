@@ -4,4 +4,7 @@
 自定义图标文字显示
 下滑线颜色等
 
+效果图
+https://github.com/joselyncui/MenuView/blob/master/sceen.png
+
 
