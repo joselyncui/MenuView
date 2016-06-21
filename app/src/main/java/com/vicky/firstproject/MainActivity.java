@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mMenuView.setmItemDatas(items);
-        mMenuView.setVisibleCount(5);
+//        mMenuView.setVisibleCount(5);
         mMenuView.setOnTabItemClickListenr(new MenuView.OnTabItemClickListener() {
             @Override
             public void onItemClick(View tabView, View parentView, int position) {

@@ -2,6 +2,7 @@ package com.vicky.firstproject.view;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
@@ -31,51 +32,72 @@ import java.util.List;
 public class MenuView extends HorizontalScrollView {
     private final String TAG = "MenuView";
 
-    private final int DEFAULT_VISIBLE_COUNT = 3;
-    private final int DEFAULT_DURATION = 300;
+    private final int DEFAULT_VISIBLE_COUNT = 3;//默认可见tab数量
+    private final int DEFAULT_DURATION = 300;//默认滑块动画时间
+    private final int DEFAULT_TEXT_COLOR = 0XB7B7B7 ;//默认文字颜色
+    private final int DEFAULT_BAR_COLOR = 0XCD5555;//默认滑块颜色
+
+    private final int ORIENTATION_VERTICAL = 0;
+    private final int ORIENTATION_HORIZONTAL = 1;
+
+    private final int  DEFAULT_ICON_ORIENTAION = ORIENTATION_VERTICAL;//默认图片文字布局
+    private final boolean DEFAULT_IS_BAR_SHOW = true;
+
+
+    private final int DEFAULT_TEXT_SIZE = DensityUtil.dip2px(getContext(),16);//默认文字大小
+    private final int DEFAULT_BAR_HEIGHT = DensityUtil.dip2px(getContext(),3);//默认滑块高度
 
     private List<TabItem> mItemDatas = new ArrayList<>();
     private RelativeLayout mParentContainer;//最外层容器
     private LinearLayout mItemContainer;//tab 容器
     private ImageView mBarView;//下滑条视图
-    private int mTabCount;//tab数量
-    private boolean isShowBar = true;
-    private int mVisibleCount;
+    private boolean isShowBar = DEFAULT_IS_BAR_SHOW;//是否显示滑块
+
 
     private OnTabItemClickListener mTabItemClickListenr;
-    private ObjectAnimator mBarMoveAnimator;
 
     private int mDefaultPaddingTB = DensityUtil.dip2px(getContext(),3);
     private int mDefaultPaddingLR = DensityUtil.dip2px(getContext(),3);
 
-    private int mBarHeight = DensityUtil.dip2px(getContext(),3);
+
     private int mTabWidth;
     private int mCurrentPosition;
     private int mScreenWidth;
+
+    private int mTextColor = DEFAULT_TEXT_COLOR;
+    private int mTextSize;
+    private int mVisibleCount;
+    private int mBarHeight = DEFAULT_BAR_HEIGHT;
+    private int mIconOrientation;
+    private int mBarColor;
+
+
 
     private enum Model{
         TEXT_ONLY,//只显示文字
         DEFAULT//默认图标和文字
     }
 
+
+
     public MenuView(Context context) {
         super(context);
-        initView(context);
+        initView(context,null);
     }
     public MenuView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initView(context);
+        initView(context,attrs);
     }
     public MenuView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initView(context);
+        initView(context,attrs);
     }
 
     /**
      * 初始化容器视图
      * @param context
      */
-    private void initView(Context context){
+    private void initView(Context context,AttributeSet attrs){
         setHorizontalScrollBarEnabled(false);//不要滚动条
         //设置最外层宽度自适应内容
         mParentContainer = new RelativeLayout(context);
@@ -93,8 +115,21 @@ public class MenuView extends HorizontalScrollView {
 
         addView(mParentContainer);
 
+        initStyle(attrs);
 
+    }
 
+    private void initStyle(AttributeSet attrs){
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.custom_menu_view);
+        mTextColor = a.getColor(R.styleable.custom_menu_view_textColor,DEFAULT_TEXT_COLOR);
+        mTextSize = a.getDimensionPixelSize(R.styleable.custom_menu_view_textSize,DEFAULT_TEXT_SIZE);
+        mBarColor = a.getColor(R.styleable.custom_menu_view_barColor,DEFAULT_BAR_COLOR);
+        mVisibleCount = a.getInt(R.styleable.custom_menu_view_visibleCount,DEFAULT_VISIBLE_COUNT);
+        mIconOrientation = a.getInt(R.styleable.custom_menu_view_iconOrientation,DEFAULT_ICON_ORIENTAION);
+        isShowBar = a.getBoolean(R.styleable.custom_menu_view_isBarShow,DEFAULT_IS_BAR_SHOW);
+        mBarHeight = a.getDimensionPixelOffset(R.styleable.custom_menu_view_barHeight,DEFAULT_BAR_HEIGHT);
+        Log.i(TAG,"style --  " + mTextColor +"  " + mTextSize +"  " + mBarColor +"  " + mIconOrientation);
+        a.recycle();
     }
 
     /**
@@ -103,7 +138,6 @@ public class MenuView extends HorizontalScrollView {
     private void initItems(int tabWidth){
         for (TabItem item : mItemDatas){
             initItem(tabWidth,item.getTitle(),item.getIcon());
-
         }
     }
 
@@ -127,14 +161,13 @@ public class MenuView extends HorizontalScrollView {
                 if (mTabItemClickListenr != null){
                     mTabItemClickListenr.onItemClick(itemView,mItemContainer,position);
                 }
-
+                scrollInScreen(itemView);
 
                 int difX =(position-mCurrentPosition)*mTabWidth;
                 moveBar(difX,Math.abs(position-mCurrentPosition)*200);
                 mCurrentPosition = position;
-                Log.i(TAG,"x --" + itemView.getX());
 
-                scrollInScreen(itemView);
+
 
             }
         });
@@ -152,10 +185,12 @@ public class MenuView extends HorizontalScrollView {
         itemView.getLocationOnScreen(location);//获取在屏幕中的绝对位置
 
         int left = location[0];
+        Log.i(TAG,"left --  " + left);
+
         int change = 0;
-        if (left<0){//如果点击项超出左边界
+        if (left<mTabWidth){//如果点击项超出左边界
             change = left - mTabWidth;
-        } else if (left+mTabWidth > mScreenWidth){//如果超出有屏幕
+        } else if (left+mTabWidth >= mScreenWidth-mTabWidth){//如果超出有屏幕
             change = left+mTabWidth-mScreenWidth + mTabWidth;
         }
 
@@ -165,7 +200,6 @@ public class MenuView extends HorizontalScrollView {
     }
 
     private void moveBar(int difX,int duration){
-        Log.i(TAG,"left dif -- " + mBarView.getX());
         ObjectAnimator transAnim = ObjectAnimator.ofFloat(mBarView, "translationX", mBarView.getX(), mBarView.getX()+difX);
 
         transAnim.setDuration(DEFAULT_DURATION);
@@ -192,8 +226,18 @@ public class MenuView extends HorizontalScrollView {
     private int calVisibleCount(){
         int size = mItemDatas.size();
         int visibleCount = size < DEFAULT_VISIBLE_COUNT ? size : DEFAULT_VISIBLE_COUNT;
-        visibleCount = mVisibleCount>mItemDatas.size()?visibleCount : mVisibleCount;
-        return visibleCount;
+        mVisibleCount = mVisibleCount>size?visibleCount : mVisibleCount;
+        Log.i(TAG,"visible count -- "  +mVisibleCount );
+        return mVisibleCount;
+    }
+
+    /**
+     * 获取可视tab数量
+     *
+     * @return
+     */
+    private int getVisibleCount(){
+        return mVisibleCount;
     }
 
     /**
@@ -210,10 +254,12 @@ public class MenuView extends HorizontalScrollView {
 
     private void addBarView(boolean isShowBar,int tabWidth){
         if (isShowBar){
+            Log.i(TAG,"width -- " + tabWidth +"  " + mBarHeight);
+
             RelativeLayout.LayoutParams barViewParams = new RelativeLayout.LayoutParams(tabWidth,mBarHeight);
             barViewParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             mBarView = new ImageView(getContext());
-            mBarView.setImageResource(R.color.colorPrimary);
+            mBarView.setBackgroundColor(mBarColor);
             mBarView.setLayoutParams(barViewParams);
             mParentContainer.addView(mBarView);
         }
