@@ -7,9 +7,6 @@
 效果图
 https://github.com/joselyncui/MenuView/blob/master/sceen.png
 
-
-使用方式：
-
 <com.vicky.firstproject.view.MenuView
         android:id="@+id/menu_view"
         android:layout_width="match_parent"
@@ -21,4 +18,14 @@ https://github.com/joselyncui/MenuView/blob/master/sceen.png
         app:iconOrientation="vertical"
         app:isBarShow="true"
         />
+
+
+
+
+
+
+
+
+
+
 
