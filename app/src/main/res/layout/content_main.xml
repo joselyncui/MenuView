@@ -14,9 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         app:textColor="@color/pink"
+        app:textSelectedColor="@color/colorAccent"
         app:barColor="@color/colorAccent"
         app:barHeight="2dp"
-        app:visibleCount="3"
+        app:visibleCount="6"
         app:iconOrientation="vertical"
         app:isBarShow="true"
         />

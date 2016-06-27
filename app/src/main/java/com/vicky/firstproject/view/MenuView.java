@@ -3,7 +3,9 @@ package com.vicky.firstproject.view;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -65,11 +67,13 @@ public class MenuView extends HorizontalScrollView {
     private int mScreenWidth;
 
     private int mTextColor = DEFAULT_TEXT_COLOR;
+    private int mTextSelectedColor = DEFAULT_TEXT_COLOR;
     private int mTextSize;
     private int mVisibleCount;
     private int mBarHeight = DEFAULT_BAR_HEIGHT;
     private int mIconOrientation;
     private int mBarColor;
+
 
 
 
@@ -122,6 +126,8 @@ public class MenuView extends HorizontalScrollView {
     private void initStyle(AttributeSet attrs){
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.custom_menu_view);
         mTextColor = a.getColor(R.styleable.custom_menu_view_textColor,DEFAULT_TEXT_COLOR);
+        mTextSelectedColor = a.getColor(R.styleable.custom_menu_view_textSelectedColor,DEFAULT_TEXT_COLOR);
+
         mTextSize = a.getDimensionPixelSize(R.styleable.custom_menu_view_textSize,DEFAULT_TEXT_SIZE);
         mBarColor = a.getColor(R.styleable.custom_menu_view_barColor,DEFAULT_BAR_COLOR);
         mVisibleCount = a.getInt(R.styleable.custom_menu_view_visibleCount,DEFAULT_VISIBLE_COUNT);
@@ -139,6 +145,8 @@ public class MenuView extends HorizontalScrollView {
         for (TabItem item : mItemDatas){
             initItem(tabWidth,item.getTitle(),item.getIcon());
         }
+
+        ((TabItemView)mItemContainer.getChildAt(0)).setTextSelected(true);
     }
 
     /**
@@ -146,29 +154,34 @@ public class MenuView extends HorizontalScrollView {
      * @param title
      * @param icon
      */
-    private void initItem(int width,String title, String icon){
+    private void initItem(int width, final String title, String icon){
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT);
         final TabItemView itemView = new TabItemView(getContext());
-        itemView.setTitleView(title);
+        itemView.setTitle(title);
         itemView.setLayoutParams(params);
+        itemView.setTextColor(mTextColor);
+        itemView.setTextSelectColor(mTextSelectedColor);
+        itemView.setImgBmp(BitmapFactory.decodeResource(getResources(),R.drawable.md_refresh_loading01));
 
         itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 int position = mItemContainer.indexOfChild(itemView);//获取是第几个子元素
+                if (mCurrentPosition!= position){
+                    TabItemView lastItem = (TabItemView) mItemContainer.getChildAt(mCurrentPosition);
+                    lastItem.setTextSelected(false);//将上一个item设置为未选中状态
+                    itemView.setTextSelected(true);//将当前item设置为选中状态
 
-                if (mTabItemClickListenr != null){
-                    mTabItemClickListenr.onItemClick(itemView,mItemContainer,position);
+                    if (mTabItemClickListenr != null){
+                        mTabItemClickListenr.onItemClick(itemView,mItemContainer,position);
+                    }
+                    scrollInScreen(itemView);
+
+                    int difX =(position-mCurrentPosition)*mTabWidth;
+                    moveBar(difX,Math.abs(position-mCurrentPosition)*200);
+                    mCurrentPosition = position;
                 }
-                scrollInScreen(itemView);
-
-                int difX =(position-mCurrentPosition)*mTabWidth;
-                moveBar(difX,Math.abs(position-mCurrentPosition)*200);
-                mCurrentPosition = position;
-
-
-
             }
         });
 

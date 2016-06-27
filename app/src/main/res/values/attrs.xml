@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="custom_menu_view">
         <attr name="textColor" format="color"/><!--文字颜色-->
+        <attr name="textSelectedColor" format="color"/><!--文本被选中之后的颜色-->
         <attr name="textSize" format="dimension"/><!--文字大小-->
         <attr name="visibleCount" format="integer"/><!--可见数量-->
         <attr name="iconOrientation"><!--icon 和文字 布局方向，垂直/水平-->
