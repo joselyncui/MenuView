@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 
-import com.vicky.firstproject.model.TabItem;
 import com.vicky.firstproject.view.MenuView;
 
 import java.util.ArrayList;
