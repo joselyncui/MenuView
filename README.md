@@ -1,11 +1,15 @@
 # MenuView
-实现可滑动的TabView
-可以指定可视tab数量
-自定义图标文字显示
-下滑线颜色等
+代码重构为adapter模式
+使定制更加简单
+
+可以自定义 item的布局
 
 效果图
 https://github.com/joselyncui/MenuView/blob/master/sceen.png
+
+https://github.com/joselyncui/MenuView/blob/adapter/screen1.png
+
+
 
 <com.vicky.firstproject.view.MenuView
         android:id="@+id/menu_view"
