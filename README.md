@@ -4,6 +4,8 @@
 
 可以自定义 item的布局
 
+推荐使用 adapter 分支 可以自定义tab的布局
+
 效果图
 https://github.com/joselyncui/MenuView/blob/master/sceen.png
 
