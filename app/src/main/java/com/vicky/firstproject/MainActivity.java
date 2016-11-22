@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 currentTv.setTextColor(Color.parseColor("#FF4081"));
             }
         });
+        mMenuView.setVisibleCount(3);
 
         mMenuView.post(new Runnable() {
             @Override
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initMenuData(){
 
-        for (int i = 0, size=10;i < size;i++){
+        for (int i = 0, size=20;i < size;i++){
             mItems.add("tab-" + i);
         }
 //        mItems.add("我是天才");

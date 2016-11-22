@@ -3,14 +3,10 @@ package com.vicky.firstproject.view;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
+import android.support.annotation.IntRange;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.vicky.firstproject.R;
-import com.vicky.firstproject.model.TabItem;
-import com.vicky.firstproject.model.TabItem;
 import com.vicky.firstproject.util.DensityUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -268,7 +261,7 @@ public class MenuView extends HorizontalScrollView {
      *
      * @param count
      */
-    public void setVisibleCount(int count){
+    public void setVisibleCount(@IntRange(from = 1) int count){
         this.mVisibleCount = count;
         this.mVisibleCount = this.mVisibleCount>0 ? this.mVisibleCount : DEFAULT_VISIBLE_COUNT;
     }
@@ -277,7 +270,7 @@ public class MenuView extends HorizontalScrollView {
      * 设置某个item选中
      * @param position
      */
-    public void setItemSelected(int position){
+    public void setItemSelected(@IntRange(from = 0) int position){
         if (mAdapter!= null && mAdapter.getCount()>0 && mAdapter.getCount()>position&&
                 mCurrentPosition != position && mItemContainer.getChildAt(position)!= null){
             mItemContainer.getChildAt(position).performClick();
@@ -288,7 +281,7 @@ public class MenuView extends HorizontalScrollView {
      * 设置滑块动画时间
      * @param duration
      */
-    public void setDuration(int duration){
+    public void setDuration(@IntRange(from = 0) int duration){
         this.mDuration = duration;
     }
 
@@ -299,25 +292,13 @@ public class MenuView extends HorizontalScrollView {
      * @param context
      * @return int 屏幕宽度
      */
-    public static int getScreenWidth(Context context) {
+    private int getScreenWidth(Context context) {
         WindowManager manager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
         return display.getWidth();
     }
 
-    /**
-     * 获取屏幕的高度
-     *
-     * @param context
-     * @return int 屏幕高度
-     */
-    public static int getScreenHeight(Context context) {
-        WindowManager manager = (WindowManager) context
-                .getSystemService(Context.WINDOW_SERVICE);
-        Display display = manager.getDefaultDisplay();
-        return display.getHeight();
-    }
 
 
     public void setmDefaultPaddingTB(int mDefaultPaddingTB) {
