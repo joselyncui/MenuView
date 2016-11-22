@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="custom_menu_view">
-        <attr name="textColor" format="color"/><!--文字颜色-->
-        <attr name="textSelectedColor" format="color"/><!--文本被选中之后的颜色-->
-        <attr name="textSize" format="dimension"/><!--文字大小-->
         <attr name="visibleCount" format="integer"/><!--可见数量-->
-        <attr name="iconOrientation"><!--icon 和文字 布局方向，垂直/水平-->
-            <enum name="vertical" value="0"/>
-            <enum name="horizontal" value="1"/>
-        </attr>
         <attr name="barColor" format="color"/><!--滑块颜色-->
         <attr name="barHeight" format="dimension"/><!--滑块高度-->
         <attr name="isBarShow" format="boolean"/>
+        <attr name="duration" format="integer"/><!--滑块动画时长:毫秒数-->
     </declare-styleable>
 </resources>

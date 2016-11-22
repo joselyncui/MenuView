@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.BaseAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,25 +37,17 @@ public class MenuView extends HorizontalScrollView {
 
     private final int DEFAULT_VISIBLE_COUNT = 3;//默认可见tab数量
     private final int DEFAULT_DURATION = 300;//默认滑块动画时间
-    private final int DEFAULT_TEXT_COLOR = 0XB7B7B7 ;//默认文字颜色
     private final int DEFAULT_BAR_COLOR = 0XCD5555;//默认滑块颜色
 
-    private final int ORIENTATION_VERTICAL = 0;
-    private final int ORIENTATION_HORIZONTAL = 1;
-
-    private final int  DEFAULT_ICON_ORIENTAION = ORIENTATION_VERTICAL;//默认图片文字布局
     private final boolean DEFAULT_IS_BAR_SHOW = true;
 
-
-    private final int DEFAULT_TEXT_SIZE = DensityUtil.dip2px(getContext(),16);//默认文字大小
     private final int DEFAULT_BAR_HEIGHT = DensityUtil.dip2px(getContext(),3);//默认滑块高度
 
-    private List<TabItem> mItemDatas = new ArrayList<>();
     private RelativeLayout mParentContainer;//最外层容器
     private LinearLayout mItemContainer;//tab 容器
     private ImageView mBarView;//下滑条视图
     private boolean isShowBar = DEFAULT_IS_BAR_SHOW;//是否显示滑块
-
+    private int mDuration = DEFAULT_DURATION;
 
     private OnTabItemClickListener mTabItemClickListenr;
 
@@ -66,23 +59,11 @@ public class MenuView extends HorizontalScrollView {
     private int mCurrentPosition;
     private int mScreenWidth;
 
-    private int mTextColor = DEFAULT_TEXT_COLOR;
-    private int mTextSelectedColor = DEFAULT_TEXT_COLOR;
-    private int mTextSize;
     private int mVisibleCount;
     private int mBarHeight = DEFAULT_BAR_HEIGHT;
-    private int mIconOrientation;
     private int mBarColor;
 
-
-
-
-    private enum Model{
-        TEXT_ONLY,//只显示文字
-        DEFAULT//默认图标和文字
-    }
-
-
+    private BaseAdapter mAdapter;
 
     public MenuView(Context context) {
         super(context);
@@ -116,76 +97,60 @@ public class MenuView extends HorizontalScrollView {
         mItemContainer.setLayoutParams(itemContainerParams);
 
         mParentContainer.addView(mItemContainer);
-
         addView(mParentContainer);
-
         initStyle(attrs);
 
     }
 
     private void initStyle(AttributeSet attrs){
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.custom_menu_view);
-        mTextColor = a.getColor(R.styleable.custom_menu_view_textColor,DEFAULT_TEXT_COLOR);
-        mTextSelectedColor = a.getColor(R.styleable.custom_menu_view_textSelectedColor,DEFAULT_TEXT_COLOR);
 
-        mTextSize = a.getDimensionPixelSize(R.styleable.custom_menu_view_textSize,DEFAULT_TEXT_SIZE);
         mBarColor = a.getColor(R.styleable.custom_menu_view_barColor,DEFAULT_BAR_COLOR);
         mVisibleCount = a.getInt(R.styleable.custom_menu_view_visibleCount,DEFAULT_VISIBLE_COUNT);
-        mIconOrientation = a.getInt(R.styleable.custom_menu_view_iconOrientation,DEFAULT_ICON_ORIENTAION);
         isShowBar = a.getBoolean(R.styleable.custom_menu_view_isBarShow,DEFAULT_IS_BAR_SHOW);
         mBarHeight = a.getDimensionPixelOffset(R.styleable.custom_menu_view_barHeight,DEFAULT_BAR_HEIGHT);
-        Log.i(TAG,"style --  " + mTextColor +"  " + mTextSize +"  " + mBarColor +"  " + mIconOrientation);
+        mDuration = a.getInt(R.styleable.custom_menu_view_duration,DEFAULT_DURATION);
         a.recycle();
     }
 
-    /**
-     * 初始化tab
-     */
-    private void initItems(int tabWidth){
-        for (TabItem item : mItemDatas){
-            initItem(tabWidth,item.getTitle(),item.getIcon());
+    private void buildMenuItems(int tabWidth){
+        for (int i = 0, size = mAdapter.getCount(); i < size;i++){
+            final View view = mAdapter.getView(i,null,this);
+            View itemView = buildItem(view, tabWidth,i);
+            mItemContainer.addView(itemView);
         }
-
-        ((TabItemView)mItemContainer.getChildAt(0)).setTextSelected(true);
     }
 
     /**
      * 初始化单个tab视图
-     * @param title
-     * @param icon
      */
-    private void initItem(int width, final String title, String icon){
+    private View buildItem(final View view, final int tabWidth, final int position){
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT);
-        final TabItemView itemView = new TabItemView(getContext());
-        itemView.setTitle(title);
-        itemView.setLayoutParams(params);
-        itemView.setTextColor(mTextColor);
-        itemView.setTextSelectColor(mTextSelectedColor);
-        itemView.setImgBmp(BitmapFactory.decodeResource(getResources(),R.drawable.md_refresh_loading01));
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(tabWidth, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        itemView.setOnClickListener(new OnClickListener() {
+        view.setLayoutParams(params);
+        view.setPadding(mDefaultPaddingLR,mDefaultPaddingTB,mDefaultPaddingLR,mDefaultPaddingTB);
+
+        view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = mItemContainer.indexOfChild(itemView);//获取是第几个子元素
-                if (mCurrentPosition!= position){
-                    TabItemView lastItem = (TabItemView) mItemContainer.getChildAt(mCurrentPosition);
-                    lastItem.setTextSelected(false);//将上一个item设置为未选中状态
-                    itemView.setTextSelected(true);//将当前item设置为选中状态
-
+                if (mCurrentPosition==0&&position==0||mCurrentPosition!= position){
+                    View lastView = mItemContainer.getChildAt(mCurrentPosition);
                     if (mTabItemClickListenr != null){
-                        mTabItemClickListenr.onItemClick(itemView,mItemContainer,position);
+                        mTabItemClickListenr.onItemClick(mItemContainer,view,lastView,position,mCurrentPosition);
                     }
-                    scrollInScreen(itemView);
+                    scrollInScreen(view);
 
-                    int difX =(position-mCurrentPosition)*mTabWidth;
-                    moveBar(difX,Math.abs(position-mCurrentPosition)*200);
+                    int difX =(position-mCurrentPosition)*tabWidth;
+                    if (isShowBar){
+                        moveBar(difX,mDuration);
+                    }
                     mCurrentPosition = position;
                 }
             }
         });
 
-        mItemContainer.addView(itemView);
+        return view;
     }
 
     /**
@@ -215,8 +180,8 @@ public class MenuView extends HorizontalScrollView {
     private void moveBar(int difX,int duration){
         ObjectAnimator transAnim = ObjectAnimator.ofFloat(mBarView, "translationX", mBarView.getX(), mBarView.getX()+difX);
 
-        transAnim.setDuration(DEFAULT_DURATION);
-        transAnim.start();;
+        transAnim.setDuration(duration<=0?DEFAULT_DURATION:duration);
+        transAnim.start();
     }
 
     /**
@@ -225,8 +190,9 @@ public class MenuView extends HorizontalScrollView {
     public void notifyDataChange(){
         int visibleCount = calVisibleCount();
         mTabWidth = calTabWidth(visibleCount);
-        initItems(mTabWidth);
+        buildMenuItems(mTabWidth);
         addBarView(isShowBar,mTabWidth);
+        mItemContainer.getChildAt(0).performClick();
     }
 
     /**
@@ -237,7 +203,7 @@ public class MenuView extends HorizontalScrollView {
      * @return int 可见数量
      */
     private int calVisibleCount(){
-        int size = mItemDatas.size();
+        int size = mAdapter.getCount();
         int visibleCount = size < DEFAULT_VISIBLE_COUNT ? size : DEFAULT_VISIBLE_COUNT;
         mVisibleCount = mVisibleCount>size?visibleCount : mVisibleCount;
         Log.i(TAG,"visible count -- "  +mVisibleCount );
@@ -296,6 +262,13 @@ public class MenuView extends HorizontalScrollView {
         this.mVisibleCount = count;
     }
 
+    /**
+     * 设置滑块动画时间
+     * @param duration
+     */
+    public void setDuration(int duration){
+        this.mDuration = duration;
+    }
 
 
     /**
@@ -324,9 +297,6 @@ public class MenuView extends HorizontalScrollView {
         return display.getHeight();
     }
 
-    public void setmItemDatas(List<TabItem> mItemDatas) {
-        this.mItemDatas = mItemDatas;
-    }
 
     public void setmDefaultPaddingTB(int mDefaultPaddingTB) {
         this.mDefaultPaddingTB = mDefaultPaddingTB;
@@ -336,19 +306,98 @@ public class MenuView extends HorizontalScrollView {
         this.mDefaultPaddingLR = mDefaultPaddingLR;
     }
 
+    /**
+     * 设置adapter
+     *
+     * @param adapter
+     */
+    public void setAdapter(BaseAdapter adapter){
+        this.mAdapter = adapter;
+    }
 
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        notifyDataChange();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+    }
 
     /**
      * Tab 项点击监听
      */
     public interface OnTabItemClickListener{
+
         /**
-         * 点击tab 响应事件
+         * tab 点击事件
          *
-         * @param tabView
-         * @param parentView
-         * @param position tab 索引位置
+         * @param parentView 父view
+         * @param currentTab 当前点击的tab
+         * @param lastTab 上次点击的tab
+         * @param currentPos 当前点击的位置
+         * @param lastPos 上次点击的位置
          */
-        public void onItemClick(View tabView, View parentView,int position);
+        void onItemClick(View parentView,View currentTab, View lastTab,int currentPos,int lastPos);
+    }
+
+    public static abstract class BaseMenuAdapter<T> extends BaseAdapter{
+        private List<T> mItems;
+
+        public BaseMenuAdapter(List<T> items){
+            this.mItems = items;
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
+
+        @Override
+        public T getItem(int position) {
+            return mItems.get(position);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            convertView = inflater.inflate(getLayoutId(),parent,false);
+            bindData(convertView,position);
+            return convertView;
+        }
+
+        /**
+         * 设置item的布局
+         *
+         * @return
+         */
+        public abstract int getLayoutId();
+
+        /**
+         * 绑定数据
+         * @param itemView
+         * @param position
+         */
+        public abstract void bindData(View itemView, int position);
+
+        @Override
+        public int getItemViewType(int position) {
+            return super.getItemViewType(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+
+        }
     }
 }

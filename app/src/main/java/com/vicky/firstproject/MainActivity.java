@@ -1,7 +1,6 @@
 package com.vicky.firstproject;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vicky.firstproject.model.TabItem;
 import com.vicky.firstproject.view.MenuView;
@@ -24,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final String TAG ="first_project";
     private MenuView mMenuView;
-    private TextView mTextView;
+    List<String> mItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,31 +44,51 @@ public class MainActivity extends AppCompatActivity {
         mMenuView = (MenuView) findViewById(R.id.menu_view);
         initMenuData();
 
+        mMenuView.setAdapter(new MenuView.BaseMenuAdapter<String>(mItems) {
+            @Override
+            public int getLayoutId() {
+                return R.layout.tab_item;
+            }
+
+            @Override
+            public void bindData(View itemView, int position) {
+                String item = getItem(position);
+                TextView textView = (TextView) itemView.findViewById(R.id.text);
+                textView.setText(item);
+            }
+        });
+
+        mMenuView.setOnTabItemClickListenr(new MenuView.OnTabItemClickListener(){
+            @Override
+            public void onItemClick(View parentView, View currentTab, View lastTab, int currentPos, int lastPos) {
+                TextView lastTv = (TextView) lastTab.findViewById(R.id.text);
+                lastTv.setTextColor(Color.parseColor("#000000"));
+
+                TextView currentTv = (TextView) currentTab.findViewById(R.id.text);
+                currentTv.setTextColor(Color.parseColor("#FF4081"));
+            }
+        });
+
 
     }
 
     private void initMenuData(){
-        List<TabItem> items = new ArrayList<>();
-        for (int i = 0; i < 20; i++){
-            TabItem menuItem = new TabItem();
-            menuItem.setIcon("");
-            menuItem.setTitle("tab-" + i);
-            items.add(menuItem);
+
+        for (int i = 0, size=10;i < size;i++){
+            mItems.add("tab-" + i);
         }
-
-        mMenuView.setmItemDatas(items);
-        mMenuView.setOnTabItemClickListenr(new MenuView.OnTabItemClickListener() {
-            @Override
-            public void onItemClick(View tabView, View parentView, int position) {
-                Toast.makeText(getApplicationContext(),"click - " + position,Toast.LENGTH_LONG).show();
-            }
-        });
-        mMenuView.notifyDataChange();
-
+//        mItems.add("我是天才");
+//        mItems.add("世界和平");
+//        mItems.add("德玛西亚");
+//        mItems.add("兽人永不为奴");
+//        mItems.add("我走过山时，山不说话");
+//        mItems.add("我走过海时，还不说话");
+//        mItems.add("小毛驴滴滴答答");
+//        mItems.add("倚天剑伴我走天涯");
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu; this adds mItems to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }

@@ -8,18 +8,15 @@
     tools:context="com.vicky.firstproject.MainActivity"
     tools:showIn="@layout/activity_main"
     android:orientation="horizontal">
-
     <com.vicky.firstproject.view.MenuView
         android:id="@+id/menu_view"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        app:textColor="@color/pink"
-        app:textSelectedColor="@color/colorAccent"
         app:barColor="@color/colorAccent"
         app:barHeight="2dp"
-        app:visibleCount="6"
-        app:iconOrientation="vertical"
+        app:visibleCount="4"
         app:isBarShow="true"
+        app:duration="200"
         />
 
     <!--
