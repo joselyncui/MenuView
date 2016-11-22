@@ -69,6 +69,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mMenuView.post(new Runnable() {
+            @Override
+            public void run() {
+                mMenuView.setItemSelected(4);
+            }
+        });
+
+
+
 
     }
 

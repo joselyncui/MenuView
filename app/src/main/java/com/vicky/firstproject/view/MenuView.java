@@ -107,6 +107,7 @@ public class MenuView extends HorizontalScrollView {
 
         mBarColor = a.getColor(R.styleable.custom_menu_view_barColor,DEFAULT_BAR_COLOR);
         mVisibleCount = a.getInt(R.styleable.custom_menu_view_visibleCount,DEFAULT_VISIBLE_COUNT);
+        mVisibleCount = mVisibleCount>0 ? mVisibleCount:DEFAULT_VISIBLE_COUNT;
         isShowBar = a.getBoolean(R.styleable.custom_menu_view_isBarShow,DEFAULT_IS_BAR_SHOW);
         mBarHeight = a.getDimensionPixelOffset(R.styleable.custom_menu_view_barHeight,DEFAULT_BAR_HEIGHT);
         mDuration = a.getInt(R.styleable.custom_menu_view_duration,DEFAULT_DURATION);
@@ -269,6 +270,18 @@ public class MenuView extends HorizontalScrollView {
      */
     public void setVisibleCount(int count){
         this.mVisibleCount = count;
+        this.mVisibleCount = this.mVisibleCount>0 ? this.mVisibleCount : DEFAULT_VISIBLE_COUNT;
+    }
+
+    /**
+     * 设置某个item选中
+     * @param position
+     */
+    public void setItemSelected(int position){
+        if (mAdapter!= null && mAdapter.getCount()>0 && mAdapter.getCount()>position&&
+                mCurrentPosition != position && mItemContainer.getChildAt(position)!= null){
+            mItemContainer.getChildAt(position).performClick();
+        }
     }
 
     /**

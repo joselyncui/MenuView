@@ -14,7 +14,7 @@
         android:layout_height="65dp"
         app:barColor="@color/colorAccent"
         app:barHeight="2dp"
-        app:visibleCount="4"
+        app:visibleCount="0"
         app:isBarShow="true"
         app:duration="200"
         android:background="#FFF68F"
