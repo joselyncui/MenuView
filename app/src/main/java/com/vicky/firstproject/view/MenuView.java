@@ -187,7 +187,16 @@ public class MenuView extends HorizontalScrollView {
     /**
      * 通知刷新界面
      */
-    public void notifyDataChange(){
+    public void notifyDataChange() {
+        if (mAdapter==null){
+            Log.e(TAG,"你没有设置adapter");
+            return;
+        }
+
+        if (mAdapter.getCount()==0){
+            Log.i(TAG,"没有数据");
+            return;
+        }
         int visibleCount = calVisibleCount();
         mTabWidth = calTabWidth(visibleCount);
         buildMenuItems(mTabWidth);

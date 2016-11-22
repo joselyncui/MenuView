@@ -11,12 +11,13 @@
     <com.vicky.firstproject.view.MenuView
         android:id="@+id/menu_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         app:barColor="@color/colorAccent"
         app:barHeight="2dp"
         app:visibleCount="4"
         app:isBarShow="true"
         app:duration="200"
+        android:background="#FFF68F"
         />
 
     <!--
