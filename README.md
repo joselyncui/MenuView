@@ -11,19 +11,6 @@ https://github.com/joselyncui/MenuView/blob/adapter/screen1.png
 
 
 
-<com.vicky.firstproject.view.MenuView
-        android:id="@+id/menu_view"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:textColor="@color/pink"
-        app:barColor="@color/colorAccent"
-        app:barHeight="2dp"
-        app:visibleCount="3"
-        app:iconOrientation="vertical"
-        app:isBarShow="true"
-        />
-
-
 
 
 
