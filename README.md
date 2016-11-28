@@ -5,9 +5,12 @@
 可以自定义 item的布局
 
 效果图
-https://github.com/joselyncui/MenuView/blob/master/sceen.png
+![image](https://github.com/joselyncui/MenuView/blob/master/sceen.png)
+---
+![image](https://github.com/joselyncui/MenuView/blob/master/screen1.png)
 
-https://github.com/joselyncui/MenuView/blob/adapter/screen1.png
+
+
 
 
 
